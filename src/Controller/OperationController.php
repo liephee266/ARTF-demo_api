@@ -38,6 +38,14 @@ class OperationController extends AbstractController
         $this->toolkit = $toolkit;
     }
 
+      #[Route('/', name: 'operation_list', methods: ['GET'])]
+    public function list(Request $request): JsonResponse
+    {
+        $response = $this->toolkit->getPagitionOption($request, 'Operation',  'api_Operation_show');
+        return new JsonResponse($response, Response::HTTP_OK);
+    }
+    
+
     #[Route('/{id}', name: 'operation_show', methods: ['GET'])]
     public function show(int $id): JsonResponse
     {
@@ -55,10 +63,10 @@ class OperationController extends AbstractController
     #[Route('/', name: 'operation_create', methods: ['POST'])]
     public function create(Request $request, ValidatorInterface $validator): JsonResponse
     {
-        try {
+        //try {
             $data = json_decode($request->getContent(), true);
             //code...
-            $t = ($this->entityManager->getRepository(Operation::class)->getMontantTotalDuMois($data['NumeroCNIExpediteur']) >= 1000000);
+            $t = ($this->entityManager->getRepository(Operation::class)->getMontantTotalDuMois(numero_cni_expediteur: $data['numero_cni_expediteur']) >= 1000000);
             if ($t) {
                 # code...
                 $data['statu'] = "Rejeté";
@@ -80,15 +88,15 @@ class OperationController extends AbstractController
             $this->entityManager->persist($operation);
             $this->entityManager->flush();
             return new JsonResponse(['message' => 'Operation crée avec succès', 'code' => 200], Response::HTTP_OK);
-        } catch (\Throwable $th) {
-            return new JsonResponse(['message' => "un problème est survenu lors de la création de l Operation", 'code' => 500], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+       // } catch (\Throwable $th) {
+         //   return new JsonResponse(['message' => "un problème est survenu lors de la création de l Operation", 'code' => 500], Response::HTTP_INTERNAL_SERVER_ERROR);
+      //  }
     }
 
     #[Route('/{id}', name: 'operation_update', methods: ['PUT'])]
     public function update(int $id, Request $request): JsonResponse
     {
-        try {
+       // try {
             $operation = $this->OperationRepository->find($id);
             $data = json_decode($request->getContent(), true);
             $operation->setMontant($data['montant'] ?? $operation->getMontant())
@@ -105,9 +113,9 @@ class OperationController extends AbstractController
             $this->entityManager->persist($operation);
             $this->entityManager->flush();
             return new JsonResponse(['message' => 'Operation modifié avec succès', 'code' => 200], Response::HTTP_OK);
-        } catch (\Throwable $th) {
+        //} catch (\Throwable $th) {
             return new JsonResponse(['message' => 'Operation introuvable', 'code' => 404], Response::HTTP_NOT_FOUND);
-        }
+       // }
     }
 
     #[Route('/{id}', name: 'operation_delete', methods: ['DELETE'])]
@@ -122,11 +130,11 @@ class OperationController extends AbstractController
             return new JsonResponse(['message' => 'Operation introuvable', 'code' => 404], Response::HTTP_NOT_FOUND);
         }
     }
-    #[Route("/montants/{numeroCniexpediteur}", name: "operation_montants", methods: ['GET'])]
-    public function index(string $numeroCniexpediteur, OperationRepository $operationRepository): Response
+    #[Route("/montants/{numero_cni_expediteur}", name: "operation_montants", methods: ['GET'])]
+    public function index(string $numero_cni_expediteur, OperationRepository $operationRepository): Response
     {
         // Récupérer la somme des montants pour ce numéro d'expéditeur dans le mois
-        $montantTotalDuMois = $operationRepository->getMontantTotalDuMois($numeroCniexpediteur);
+        $montantTotalDuMois = $operationRepository->getMontantTotalDuMois($numero_cni_expediteur);
         
         // Limite autorisée
         $limite = 1000000;
