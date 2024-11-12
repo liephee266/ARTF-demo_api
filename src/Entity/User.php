@@ -26,7 +26,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $roles = null;
 
     #[ORM\Column(length: 255)]
+<<<<<<< HEAD
     #[Groups(["user","api_organisation_show"])]
+=======
+>>>>>>> 2301e1b8095742ef391151c71f3393b7335306de
 
     private ?string $password = null;
 
