@@ -90,7 +90,7 @@ class UserController extends AbstractController
     #[Route('/{id}', name: 'users_update', methods: ['PUT'])]
     public function update(int $id, Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
-        try {
+       try {
             $user = $this->usersRepository->find($id);
             $data = json_decode($request->getContent(), true);
             $user->setNom($data['nom'] ?? $user->getNom())
@@ -101,9 +101,9 @@ class UserController extends AbstractController
                 $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
                 $user->setPassword($hashedPassword);
             }
-            if ($data['id_orgnisation'] !== null) {
-                $id_orgnisation = $this->entityManager->getRepository(Organisation::class)->findOneBy(['id' => $data['id_orgnisation']]);
-                $user->setIdOrganisation($id_orgnisation);
+            if ($data['id_organisation'] !== null) {
+                $id_organisation = $this->entityManager->getRepository(Organisation::class)->findOneBy(['id' => $data['id_organisation']]);
+                $user->setIdOrganisation($id_organisation);
             }
             $this->entityManager->flush();
             return new JsonResponse(['message' => 'Utilisateur modifié avec succès', 'code' => 200], Response::HTTP_OK);

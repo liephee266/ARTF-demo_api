@@ -19,17 +19,17 @@ class OperationRepository extends ServiceEntityRepository
      * Cette méthode calcule la somme des montants des opérations d'un expéditeur dans le mois
      * et retourne cette somme.
      */
-    public function getMontantTotalDuMois(string $numeroCniexpediteur)
+    public function getMontantTotalDuMois(string $numero_cni_expediteur)
     {
         $dateDebutMois = new DateTime('first day of this month');
         $dateFinMois = new DateTime('now');
 
         $queryBuilder = $this->createQueryBuilder('o')
-            ->select('SUM(o.Montant) as totalMontant')
-            ->where('o.NumeroCNIExpediteur = :NumeroCNIExpediteur')
-            ->andWhere('o.CreatedAt >= :dateDebutMois')
-            ->andWhere('o.CreatedAt <= :dateFinMois')
-            ->setParameter('NumeroCNIExpediteur', $numeroCniexpediteur)
+            ->select('SUM(o.montant) as totalMontant')
+            ->where('o.numero_cni_expediteur = :numero_cni_expediteur')
+            ->andWhere('o.created_at >= :dateDebutMois')
+            ->andWhere('o.created_at <= :dateFinMois')
+            ->setParameter('numero_cni_expediteur', $numero_cni_expediteur)
             ->setParameter('dateDebutMois', $dateDebutMois)
             ->setParameter('dateFinMois', $dateFinMois);
 
