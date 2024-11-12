@@ -38,6 +38,15 @@ class UserController extends AbstractController
         $this->toolkit = $toolkit;
     }
 
+    #[Route('/data-select', name: 'app_app_data_select', methods: ['POST'])]
+    public function dataSelect(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $dataSelectEntity = $this->toolkit->formatArrayEntity($data['data_select']);
+        $allSelectEntity = $this->toolkit->formatArrayEntityLabel($dataSelectEntity);
+        return  new JsonResponse(($allSelectEntity), Response::HTTP_OK);        
+    }
+
     #[Route('/', name: 'users_list', methods: ['GET'])]
     public function list(Request $request): JsonResponse
     {

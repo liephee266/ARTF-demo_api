@@ -17,12 +17,12 @@ class Organisation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["api_Organisation_show", "Organisation_list"])]
+    #[Groups(["api_Organisation_show", "Organisation_list","data_select"])]
 
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["api_administration_show", "Organisation_list"])]
+    #[Groups(["api_Organisation_show", "Organisation_list", "data_select"])]
 
     private ?string $nom = null;
 
@@ -32,7 +32,7 @@ class Organisation
     private ?string $sigle = null;
 
     #[ORM\Column(length: 255,type: 'string', unique: true)]
-    #[Groups(["api_Organisation_show", "Organisation_list"])]
+    #[Groups(["api_Organisation_show", "Organisation_list","data_select"])]
     private ?string $uuid = null;
 
     #[ORM\Column]
