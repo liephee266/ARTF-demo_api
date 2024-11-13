@@ -71,6 +71,7 @@ class OperationController extends AbstractController
                 # code...
                 $data['statu'] = "Rejeté";
                 //la fonction pour
+                return new JsonResponse(['message' => 'Operation rejete', 'code' => 200], Response::HTTP_OK);
             }
             $operation = new Operation();
             $operation->setMontant($data['montant'])
