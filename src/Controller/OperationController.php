@@ -5,6 +5,7 @@ use App\Entity\User;
 use Pagerfanta\Pagerfanta;
 use App\Entity\Operation;
 use App\Entity\Organisation;
+use App\Entity\Statut;
 use App\Repository\OperationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
@@ -16,7 +17,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Services\Toolkit;
-
+use PhpParser\Node\Stmt\Else_;
 
 #[Route('/api/v1/operations')]
 class OperationController extends AbstractController
@@ -65,14 +66,6 @@ class OperationController extends AbstractController
     {
         //try {
             $data = json_decode($request->getContent(), true);
-            //code...
-            $t = ($this->entityManager->getRepository(Operation::class)->getMontantTotalDuMois(numero_cni_expediteur: $data['numero_cni_expediteur']) >= 1000000);
-            if ($t) {
-                # code...
-                $data['statu'] = "Rejeté";
-                //la fonction pour
-                return new JsonResponse(['message' => 'Operation rejete', 'code' => 200], Response::HTTP_OK);
-            }
             $operation = new Operation();
             $operation->setMontant($data['montant'])
                     ->setNomDestinataire($data['nom_destinataire'] )
@@ -85,14 +78,30 @@ class OperationController extends AbstractController
                 $id_user = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $data['id_user']]);
                 $operation->setUser($id_user);
             }
+            if ($data['statut'] !== null) {
+                $statut = $this->entityManager->getRepository(Statut::class)->findOneBy(['id' => $data['statut']]);
+                $operation->setStatut($statut);
+            }
+            // Vérifier si le montant total des opérations pour cet expéditeur dépasse 1 000 000
+    $montantTotalDuMois = $this->entityManager->getRepository(Operation::class)
+    ->getMontantTotalDuMois($data['numero_cni_expediteur']);
+$montantTotalDuMois += $data['montant'];
             
             $this->entityManager->persist($operation);
             $this->entityManager->flush();
-            return new JsonResponse(['message' => 'Operation crée avec succès', 'code' => 200], Response::HTTP_OK);
-       // } catch (\Throwable $th) {
-         //   return new JsonResponse(['message' => "un problème est survenu lors de la création de l Operation", 'code' => 500], Response::HTTP_INTERNAL_SERVER_ERROR);
-      //  }
+
+            // Si le montant total dépasse 1 000 000, retourner un message d'avertissement mais considérer l'opération enregistrée
+    if ($montantTotalDuMois > 1000000) {
+        return new JsonResponse([
+            'message' => 'Le montant total des opérations dépasse la limite autorisée de 1 000 000 dans ce mois.',
+            'montant_total' => $montantTotalDuMois,  'code' => 200], Response::HTTP_OK);
     }
+
+    // Si l'opération est enregistrée sans dépasser la limite, répondre normalement
+    return new JsonResponse([
+        'message' => 'Opération créée avec succès.',  'code' => 200, ], Response::HTTP_OK);
+}
+  
 
     #[Route('/{id}', name: 'operation_update', methods: ['PUT'])]
     public function update(int $id, Request $request): JsonResponse
@@ -110,6 +119,10 @@ class OperationController extends AbstractController
                     if ($data['id_user'] !== null) {
                         $id_user = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $data['id_user']]);
                         $operation->setUser($id_user);
+                    }
+                    if ($data['statut'] !== null) {
+                        $statut = $this->entityManager->getRepository(Statut::class)->findOneBy(['id' => $data['statut']]);
+                        $operation->setStatut($statut);
                     }
             $this->entityManager->persist($operation);
             $this->entityManager->flush();
@@ -155,4 +168,4 @@ class OperationController extends AbstractController
             'message' => 'Le montant total des transactions dans le mois est valide.'
         ]);
     }
-}
+} 

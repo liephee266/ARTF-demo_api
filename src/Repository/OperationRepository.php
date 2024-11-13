@@ -7,6 +7,7 @@ use App\Entity\Operation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use DateTime;
+use PhpParser\Node\Expr\Empty_;
 
 class OperationRepository extends ServiceEntityRepository
 {
@@ -36,6 +37,10 @@ class OperationRepository extends ServiceEntityRepository
         $result = $queryBuilder->getQuery()->getSingleScalarResult();
 
         // Retourne la somme des montants, ou 0 si aucune opération n'a été trouvée
+        if (empty($result)) {
+            # code...
+            return 0;
+        }
         return $result ;
     }
 }

@@ -50,11 +50,16 @@ class Operation
     #[ORM\ManyToOne(inversedBy: 'id_user')]
     private ?User $user = null;
 
+    #[ORM\ManyToOne(inversedBy: 'operation')]
+    #[Groups(["api_Operation_show", "Operation_list","data_select"])]
+    private ?Statut $statut = null;
+    
     public function __construct() {
         $this->uuid = Uuid::v7()->toString();
         $this->created_at = new \DateTimeImmutable();
         $this->updated_at = new \DateTimeImmutable();
-    }
+         
+     }
 
     public function getId(): ?int
     {
@@ -157,6 +162,18 @@ class Operation
     public function setUser(?User $user): static
     {
         $this->user = $user;
+        return $this;
+    }
+
+    public function getStatut(): ?Statut
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(?Statut $statut): static
+    {
+        $this->statut = $statut;
+
         return $this;
     }
 }
